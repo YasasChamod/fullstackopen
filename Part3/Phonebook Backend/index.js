@@ -1,13 +1,17 @@
 const express = require('express')
+const cors = require('cors') // <-- ADD THIS HERE
 const morgan = require('morgan')
 const app = express()
 
+// --- MIDDLEWARE ---
+app.use(cors()) 
 app.use(express.json())
 
 morgan.token('body', (req) => req.method === 'POST' ? JSON.stringify(req.body) : '')
-
 app.use(morgan('tiny :body'))
 
+
+// --- DATA ---
 const persons = [
   {
     "id": "1",
@@ -31,6 +35,7 @@ const persons = [
   }
 ]
 
+// --- ROUTES ---
 app.get('/api/persons', (request, response) => {
   response.json(persons)
 })
@@ -86,7 +91,8 @@ app.get('/info', (request, response) => {
   )
 })
 
-const PORT = 3001
+// --- SERVER SETUP ---
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
