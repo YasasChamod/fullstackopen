@@ -1,0 +1,13 @@
+### Create blog
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Full Stack Open Part 4",
+  "author": "Yasas",
+  "url": "https://fullstackopen.com/en/part4",
+  "likes": 10
+}
+
+### Get all blogs
+GET http://localhost:3003/api/blogs

@@ -63,6 +63,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [notification, setNotification] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -111,21 +112,13 @@ const App = () => {
         })
         .catch(error => {
           console.error(`Error updating phone number for ${newName}:`, error)
+          const message = error.response?.data?.error || 'Unknown error'
+          setErrorMessage(message)
+          setTimeout(() => setErrorMessage(null), 5000)
 
           if (error.response && error.response.status === 404) {
-            setNotification({
-              message: `Information of ${newName} has already been removed from server`,
-              type: 'error'
-            })
             setPersons(persons.filter(person => person.id !== existingPerson.id))
-          } else {
-            setNotification({
-              message: `Failed to update ${newName}. Please try again.`,
-              type: 'error'
-            })
           }
-
-          setTimeout(() => setNotification(null), 5000)
         })
 
       return
@@ -138,8 +131,8 @@ const App = () => {
 
     personService
       .create(personObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
+      .then(createdPerson => {
+        setPersons(persons.concat(createdPerson.data))
         setNewName('')
         setNewNumber('')
         setNotification({
@@ -150,11 +143,9 @@ const App = () => {
       })
       .catch(error => {
         console.error('Error adding person:', error)
-        setNotification({
-          message: 'Failed to add person. Please try again.',
-          type: 'error'
-        })
-        setTimeout(() => setNotification(null), 5000)
+        const message = error.response?.data?.error || 'Unknown error'
+        setErrorMessage(message)
+        setTimeout(() => setErrorMessage(null), 5000)
       })
   }
 
@@ -191,6 +182,7 @@ const App = () => {
       <style>{`button:hover { background-color: lightblue; }`}</style>
       <h2>Phonebook</h2>
       <Notification notification={notification} />
+      {errorMessage && <div style={{ color: 'red', marginBottom: 20 }}>{errorMessage}</div>}
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       
       <h3>Add a new</h3>
